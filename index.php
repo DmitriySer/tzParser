@@ -1,4 +1,7 @@
 <?php
+require 'vendor/autoload.php';
+
+use GuzzleHttp\Client;
 
 class TestParser
 {
@@ -19,24 +22,25 @@ class TestParser
         preg_match('#\/\/(.*?)\/#',$this->link,$name);
         $this->file = $name[1];
         if(!file_exists($this->file.'.html')){
-        $file = fopen($this->file.'.html','w');
-        $timeStart = microtime(true);
-        $html = $this->link;
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_URL, $html);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-        curl_setopt($ch, CURLOPT_FILE, $file);
-        curl_exec($ch);
-        curl_close($ch);
-        $timeEnd = microtime(true);
-        $time = $timeEnd - $timeStart;
-        if ($time > 10){
-            echo "Дительность более 10 секунд";
-            exit();
-        }else {
-            echo "Длительность загрузки " . round($time, 2) . " сек ";
-        }
+            fopen($this->file.'.html','w');
+            $timeStart = microtime(true);
+            $html = $this->link;
+            $client = new Client([
+                'base_uri' => 'UriInterface',
+                'timeout' => 2.0,
+            ]);
+            $response =$client->get($html);
+            $response =$response->getBody();
+
+            file_put_contents( $this->file.'.html', $response);
+            $timeEnd = microtime(true);
+            $time = $timeEnd - $timeStart;
+            if ($time > 10){
+                echo "Дительность более 10 секунд";
+                exit();
+            }else {
+                echo "Длительность загрузки " . round($time, 2) . " сек ";
+            }
         }
         return $this->file;
     }
@@ -53,5 +57,3 @@ class TestParser
 }
 $a = new TestParser($argv[1],$argv[2],$argv[3]);
 print_r($a->replacement());
-
-
