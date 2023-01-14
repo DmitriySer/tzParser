@@ -1,82 +1,56 @@
 <?php
+error_reporting(0);
+require 'vendor/foo.php';
 
-class TestParser
-{
-    public $link;
-    public $file;
-    public $selection;
-    public $assignment;
-    public $read;
+session_start();
+?>
 
-    function __construct($link, $selection, $assignment)
-    {
-        set_time_limit(0);
-        $this->link = $link;
-        $this->selection = $selection;
-        $this->assignment = $assignment;
-    }
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Parser</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+<body>
+<?php
 
-    public function clearLink()
-    {
-        preg_match('#\/\/(.*?)\/#', $this->link, $name);
-        $this->file = $name[1];
-
-        return $this->file;
-    }
-
-    public function parser()
-    {
-        $this->clearLink();
-        $html = $this->link;
-        $ch = curl_init($html);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
-        $response = curl_exec($ch);
-        if (!$response){
-            echo "Ошибка подключения к адресу " . $this->link;
-            exit();
-        }else {
-            $file = fopen($this->file . '.html', 'w');
-            curl_setopt($ch, CURLOPT_FILE, $file);
-            curl_exec($ch);
-        }
-        curl_close($ch);
-    }
-
-
-    public function replacement()
-    {
-        $read = file_get_contents($this->file.'.html');
-        $read = str_replace( $this->selection, $this->assignment, $read);
-        file_put_contents($this->file.'.html', $read);
-
-        echo $read;
-    }
-
-    public function start()
-    {
-        $time_start = microtime(true);
-        $this->clearLink();
-        try {
-            if (!file_exists($this->file . '.html'))
+?>
+<div class="container">
+    <div class="row">
+    <form action="vendor/foo.php" method="post">
+        <div class="input-group-lg mt-5">
+            <div class="input-group mb-3">
+                <input type="text" name="link" class="form-control" placeholder='Укажите ссылку'
+                       aria-describedby="button-addon1">
+                <button class="btn btn-success" type="submit" name="linkBut"
+                ">Перейти</button>
+            </div>
+            <div class="input-group">
+                <input type="text" placeholder="Выбор" name="select" class="form-control">
+                <input type="text" placeholder="Замена" name="assignment" class="form-control">
+                <button class="btn btn-warning" name="selection" type="submit">Изменить</button>
+            </div>
+        </div>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+            <button class="btn btn-primary me-md-2 " name="save" type="submit">Сохранить в html</button>
+            <button type="submit" name="reset" class="btn btn-danger">Сбросить</button>
+        </div>
+    </form>
+    </div>
+</div>
+            <?php
+            try {
+                if ($_SESSION['site']) {
+                    echo $_SESSION['site'];
+                }
+            }catch (Exception $e)
             {
-                throw new Exception();
+                echo $e->getMessage();
             }
-            $this->replacement();
-        }catch (Exception $a)
-        {
-            $this->parser();
-            $this->replacement();
-        }
-        $time_end = microtime(true);
-        $time = $time_end - $time_start;
-        echo 'Времени заняло ' . $time;
-    }
-
-}
-$a = new TestParser($argv[1],$argv[2],$argv[3]);
-print_r($a->start());
-
-
+            ?>
+</body>
+</html>
