@@ -44,11 +44,24 @@ class TestParser
             $this->read = $response;
     }
 
-    public function replacement($selection,$assignment)
+    public function replacement()
     {
-        $read = str_replace( $this->selection, $this->assignment, $this->read);
+        if (is_array($this->selection))
+        {
+            $arr = $this->selection;
+            foreach ($arr as $k=>$v)
+            {
+                $read = str_replace($k, $v, $this->read);
 
-        $this->read = $read;
+                $this->read = $read;
+            }
+
+        } else {
+
+            $read = str_replace($this->selection, $this->assignment, $this->read);
+
+            $this->read = $read;
+        }
     }
 
     public function save()
@@ -79,7 +92,7 @@ if(isset($_POST['selection']))
     {
         $parser->file=$_SESSION['link'];
         $parser->read=$_SESSION['site'];
-        $parser->replacement($_POST['select'],$_POST['assignment']);
+        $parser->replacement();
         $read=$parser->read;
         header('Location:/');
         $_SESSION['site']=$read;
