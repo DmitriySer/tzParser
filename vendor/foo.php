@@ -91,7 +91,7 @@ if(isset($_POST['selection']))
     {
         $parser->file=$_SESSION['link'];
         $parser->read=$_SESSION['site'];
-        $parser->replacement($_POST['select'],$_POST['assignment']);
+        $parser->replacement();
         $read=$parser->read;
         header('Location:/');
         $_SESSION['site']=$read;
