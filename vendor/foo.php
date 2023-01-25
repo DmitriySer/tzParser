@@ -45,7 +45,7 @@ class TestParser
         });
     }
 
-    public function replacement($selection,$assignment)
+    public function replacement()
     {
          if (is_array($this->selection))
         {
