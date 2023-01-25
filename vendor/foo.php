@@ -47,9 +47,22 @@ class TestParser
 
     public function replacement($selection,$assignment)
     {
-        $read = str_replace( $this->selection, $this->assignment, $this->read);
+         if (is_array($this->selection))
+        {
+            $arr = $this->selection;
+            foreach ($arr as $k=>$v)
+            {
+                $read = str_replace($k, $v, $this->read);
 
-        $this->read = $read;
+                $this->read = $read;
+            }
+
+        } else {
+
+            $read = str_replace($this->selection, $this->assignment, $this->read);
+
+            $this->read = $read;
+        }
     }
 
     public function save()
